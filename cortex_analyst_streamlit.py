@@ -12,7 +12,7 @@ SCHEMA = "REVENUE_TIMESERIES"
 STAGE = "RAW_DATA"
 FILE = "revenue_timeseries.yaml"
 
-if 'CONN' not in st.session_state or st.session_state.CONN is None:
+if "CONN" not in st.session_state or st.session_state.CONN is None:
     st.session_state.CONN = snowflake.connector.connect(
         user="<user>",
         password="<password>",

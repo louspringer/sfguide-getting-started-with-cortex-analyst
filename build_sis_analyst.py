@@ -11,20 +11,11 @@ SCHEMA = "revenue_timeseries"
 STAGE = "raw_data"
 FILE = "revenue_timeseries.yaml"
 
+
 def send_message(prompt: str) -> dict:
     """Calls the REST API and returns the response."""
     request_body = {
-        "messages": [
-            {
-                "role": "user",
-                "content": [
-                    {
-                        "type": "text",
-                        "text": prompt
-                    }
-                ]
-            }
-        ],
+        "messages": [{"role": "user", "content": [{"type": "text", "text": prompt}]}],
         "semantic_model_file": f"@{DATABASE}.{SCHEMA}.{STAGE}/{FILE}",
     }
 
@@ -42,9 +33,8 @@ def send_message(prompt: str) -> dict:
         return json.loads(resp["content"])
     else:
         st.session_state.messages.pop()
-        raise Exception(
-            f"Failed request with status {resp['status']}: {resp}"
-        )
+        raise Exception(f"Failed request with status {resp['status']}: {resp}")
+
 
 def process_message(prompt: str) -> None:
     """Processes a message and adds the response to the chat."""
@@ -59,7 +49,7 @@ def process_message(prompt: str) -> None:
             request_id = response["request_id"]
             content = response["message"]["content"]
             st.session_state.messages.append(
-                {**response['message'], "request_id": request_id}
+                {**response["message"], "request_id": request_id}
             )
             display_content(content=content, request_id=request_id)  # type: ignore[arg-type]
 
