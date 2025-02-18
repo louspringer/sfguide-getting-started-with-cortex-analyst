@@ -20,13 +20,15 @@
 -- SNOWFLAKE_WAREHOUSE: Warehouse to be used
 
 -- Use application role and context
-USE ROLE identifier($SNOWFLAKE_ROLE);
-USE DATABASE identifier($SNOWFLAKE_DATABASE);
-USE SCHEMA identifier($SNOWFLAKE_DATABASE).identifier($SNOWFLAKE_SCHEMA);
-USE WAREHOUSE identifier($SNOWFLAKE_WAREHOUSE);
+USE ROLE SYSADMIN;
+USE DATABASE identifier('&SNOWFLAKE_DATABASE');
+USE SCHEMA identifier('&SNOWFLAKE_DATABASE.&SNOWFLAKE_SCHEMA');
+USE WAREHOUSE identifier('&SNOWFLAKE_WAREHOUSE');
 
+
+USE SCHEMA REVENUE_TIMESERIES;
 -- Fact table: daily_revenue
-CREATE OR REPLACE TABLE daily_revenue (
+CREATE OR REPLACE TABLE DAILY_REVENUE (
     date DATE,
     revenue FLOAT,
     cogs FLOAT,
@@ -39,14 +41,12 @@ CREATE OR REPLACE TABLE daily_revenue (
     updated_at TIMESTAMP_LTZ DEFAULT CURRENT_TIMESTAMP(),
     
     -- Constraints
-    CONSTRAINT pk_daily_revenue PRIMARY KEY (date, product_id, region_id),
-    CONSTRAINT chk_revenue_positive CHECK (revenue >= 0),
-    CONSTRAINT chk_cogs_positive CHECK (cogs >= 0)
+    CONSTRAINT pk_daily_revenue PRIMARY KEY (date, product_id, region_id)
 )
 COMMENT = 'Daily revenue fact table for Cortex Analyst demo';
 
 -- Dimension table: product_dim
-CREATE OR REPLACE TABLE product_dim (
+CREATE OR REPLACE TABLE PRODUCT_DIM (
     product_id INT,
     product_line VARCHAR(16777216),
     
@@ -60,7 +60,7 @@ CREATE OR REPLACE TABLE product_dim (
 COMMENT = 'Product dimension table for Cortex Analyst demo';
 
 -- Dimension table: region_dim
-CREATE OR REPLACE TABLE region_dim (
+CREATE OR REPLACE TABLE REGION_DIM (
     region_id INT,
     sales_region VARCHAR(16777216),
     state VARCHAR(16777216),
@@ -75,32 +75,13 @@ CREATE OR REPLACE TABLE region_dim (
 COMMENT = 'Region dimension table for Cortex Analyst demo';
 
 -- Add foreign key constraints
-ALTER TABLE daily_revenue
+ALTER TABLE DAILY_REVENUE
     ADD CONSTRAINT fk_daily_revenue_product 
     FOREIGN KEY (product_id) REFERENCES product_dim(product_id);
 
-ALTER TABLE daily_revenue
+ALTER TABLE DAILY_REVENUE
     ADD CONSTRAINT fk_daily_revenue_region
     FOREIGN KEY (region_id) REFERENCES region_dim(region_id);
-
--- Create change tracking triggers
-CREATE OR REPLACE TRIGGER trg_daily_revenue_update
-    BEFORE UPDATE ON daily_revenue
-    FOR EACH ROW
-    EXECUTE AS CALLER
-    SET updated_at = CURRENT_TIMESTAMP();
-
-CREATE OR REPLACE TRIGGER trg_product_dim_update
-    BEFORE UPDATE ON product_dim
-    FOR EACH ROW
-    EXECUTE AS CALLER
-    SET updated_at = CURRENT_TIMESTAMP();
-
-CREATE OR REPLACE TRIGGER trg_region_dim_update
-    BEFORE UPDATE ON region_dim
-    FOR EACH ROW
-    EXECUTE AS CALLER
-    SET updated_at = CURRENT_TIMESTAMP();
 
 -- Validate table creation
 SHOW TABLES LIKE '%';
@@ -112,5 +93,5 @@ SELECT
     row_count,
     bytes
 FROM information_schema.tables
-WHERE table_schema = identifier($SNOWFLAKE_SCHEMA)
+WHERE table_schema = identifier('&SNOWFLAKE_SCHEMA')
 ORDER BY table_name; 
