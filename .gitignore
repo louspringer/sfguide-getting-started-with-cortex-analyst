@@ -1,3 +1,4 @@
 .env
 .vscode/
 create_tables_old.sql
+.DS_Store
