@@ -1,9 +1,8 @@
+import json
 from typing import Dict, List, Optional
 
 import _snowflake
-import json
 import streamlit as st
-import time
 from snowflake.snowpark.context import get_active_session
 
 DATABASE = "cortex_analyst_demo"
@@ -20,7 +19,7 @@ def send_message(prompt: str) -> dict:
     }
     resp = _snowflake.send_snow_api_request(
         "POST",
-        f"/api/v2/cortex/analyst/message",
+        "/api/v2/cortex/analyst/message",
         {},
         {},
         request_body,
@@ -37,7 +36,7 @@ def send_message(prompt: str) -> dict:
 def process_message(prompt: str) -> None:
     """Processes a message and adds the response to the chat."""
     st.session_state.messages.append(
-        {"role": "user", "content": [{"type": "text", "text": prompt}]}
+        {"role": "user", "content": [{"type": "text", "text": prompt}]},
     )
     with st.chat_message("user"):
         st.markdown(prompt)
@@ -47,7 +46,7 @@ def process_message(prompt: str) -> None:
             request_id = response["request_id"]
             content = response["message"]["content"]
             st.session_state.messages.append(
-                {**response["message"], "request_id": request_id}
+                {**response["message"], "request_id": request_id},
             )
             display_content(content=content, request_id=request_id)  # type: ignore[arg-type]
 
@@ -84,7 +83,7 @@ def display_sql(sql: str) -> None:
             df = session.sql(sql).to_pandas()
             if len(df.index) > 1:
                 data_tab, line_tab, bar_tab = st.tabs(
-                    ["Data", "Line Chart", "Bar Chart"]
+                    ["Data", "Line Chart", "Bar Chart"],
                 )
                 data_tab.dataframe(df)
                 if len(df.columns) > 1:

@@ -11,15 +11,15 @@ from typing import Dict, List, Optional, Tuple
 import _snowflake  # For interacting with Snowflake-specific APIs
 import pandas as pd
 import streamlit as st  # Streamlit library for building the web app
-from snowflake.snowpark.context import (
+from snowflake.snowpark.context import (  # To interact with Snowflake sessions
     get_active_session,
-)  # To interact with Snowflake sessions
+)
 from snowflake.snowpark.exceptions import SnowparkSQLException
 
 # List of available semantic model paths in the format: <DATABASE>.<SCHEMA>.<STAGE>/<FILE-NAME>
 # Each path points to a YAML file defining a semantic model
 AVAILABLE_SEMANTIC_MODELS_PATHS = [
-    "CORTEX_ANALYST_DEMO.REVENUE_TIMESERIES.RAW_DATA/revenue_timeseries.yaml"
+    "CORTEX_ANALYST_DEMO.REVENUE_TIMESERIES.RAW_DATA/revenue_timeseries.yaml",
 ]
 API_ENDPOINT = "/api/v2/cortex/analyst/message"
 API_TIMEOUT = 50000  # in milliseconds
@@ -51,7 +51,7 @@ def show_header_and_sidebar():
     # Set the title and introductory text of the app
     st.title("Cortex Analyst")
     st.markdown(
-        "Welcome to Cortex Analyst! Type your questions below to interact with your data. "
+        "Welcome to Cortex Analyst! Type your questions below to interact with your data. ",
     )
 
     # Sidebar with a reset button
@@ -207,7 +207,8 @@ def display_message(content: List[Dict[str, str]], message_index: int):
             # Display suggestions as buttons
             for suggestion_index, suggestion in enumerate(item["suggestions"]):
                 if st.button(
-                    suggestion, key=f"suggestion_{message_index}_{suggestion_index}"
+                    suggestion,
+                    key=f"suggestion_{message_index}_{suggestion_index}",
                 ):
                     st.session_state.active_suggestion = suggestion
         elif item["type"] == "sql":
@@ -284,7 +285,9 @@ def display_charts_tab(df: pd.DataFrame, message_index: int) -> None:
         all_cols_set = set(df.columns)
         col1, col2 = st.columns(2)
         x_col = col1.selectbox(
-            "X axis", all_cols_set, key=f"x_col_select_{message_index}"
+            "X axis",
+            all_cols_set,
+            key=f"x_col_select_{message_index}",
         )
         y_col = col2.selectbox(
             "Y axis",

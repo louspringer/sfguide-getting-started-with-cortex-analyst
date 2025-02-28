@@ -5,7 +5,6 @@ import requests
 import snowflake.connector
 import streamlit as st
 
-
 HOST = "<org-name>-<account-name>.snowflakecomputing.com"
 DATABASE = "CORTEX_ANALYST_DEMO"
 SCHEMA = "REVENUE_TIMESERIES"
@@ -43,14 +42,14 @@ def send_message(prompt: str) -> Dict[str, Any]:
         return {**resp.json(), "request_id": request_id}  # type: ignore[arg-type]
     else:
         raise Exception(
-            f"Failed request (id: {request_id}) with status {resp.status_code}: {resp.text}"
+            f"Failed request (id: {request_id}) with status {resp.status_code}: {resp.text}",
         )
 
 
 def process_message(prompt: str) -> None:
     """Processes a message and adds the response to the chat."""
     st.session_state.messages.append(
-        {"role": "user", "content": [{"type": "text", "text": prompt}]}
+        {"role": "user", "content": [{"type": "text", "text": prompt}]},
     )
     with st.chat_message("user"):
         st.markdown(prompt)
@@ -61,7 +60,7 @@ def process_message(prompt: str) -> None:
             content = response["message"]["content"]
             display_content(content=content, request_id=request_id)  # type: ignore[arg-type]
     st.session_state.messages.append(
-        {"role": "assistant", "content": content, "request_id": request_id}
+        {"role": "assistant", "content": content, "request_id": request_id},
     )
 
 
@@ -91,7 +90,7 @@ def display_content(
                     df = pd.read_sql(item["statement"], st.session_state.CONN)
                     if len(df.index) > 1:
                         data_tab, line_tab, bar_tab = st.tabs(
-                            ["Data", "Line Chart", "Bar Chart"]
+                            ["Data", "Line Chart", "Bar Chart"],
                         )
                         data_tab.dataframe(df)
                         if len(df.columns) > 1:
